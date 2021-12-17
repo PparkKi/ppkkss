@@ -1,9 +1,8 @@
+import React, { useState, useEffect, useRef } from "react";
 import { collection, onSnapshot, orderBy, query } from "@firebase/firestore";
 import Chat from "components/Chat";
 import ChatForm from "components/ChatForm";
 import { dbService } from "fbase";
-import React, { useState } from "react";
-import { useEffect, useRef } from "react/cjs/react.development";
 
 const Chatting = ({ userObj, containerStyle }) => {
   const [chats, setChats] = useState([]); // 입력된 총 메시지

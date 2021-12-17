@@ -105,7 +105,7 @@ const containerStyle = {
 const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(true); // 사이드 메뉴 on/off 여부
-  const [menu, setMenu] = useState(["home", "chatting", "notice", "profile"]); // 메뉴 link => component
+  const [menu, setMenu] = useState(["", "chatting", "notice", "profile"]); // 메뉴 link => component
   const [icon, setIcon] = useState([
     <HiHome size={39} />,
     <HiChatAlt2 size={39} />,
@@ -195,7 +195,7 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
                 <>
                   <Route
                     exact
-                    path="/home"
+                    path="/"
                     element={
                       <Home userObj={userObj} containerStyle={containerStyle} />
                     }
