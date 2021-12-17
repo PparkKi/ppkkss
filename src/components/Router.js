@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { HashRouter as Router, Route, Routes, Link } from "react-router-dom";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
@@ -127,7 +127,7 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
   };
 
   return (
-    <Router basename={process.env.PUBLIC_URL}>
+    <Router>
       <Box sx={{ display: "flex" }}>
         {isLoggedIn && (
           <>
