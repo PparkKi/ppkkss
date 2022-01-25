@@ -7,6 +7,8 @@ import {
   doc,
   updateDoc,
   deleteDoc,
+  where,
+  getDocs,
 } from "@firebase/firestore";
 import { dbService } from "fbase";
 import FullCalendar from "@fullcalendar/react";
@@ -30,9 +32,10 @@ const calStyle = {
   p: 4,
 };
 
-const Calendar = ({ userObj }) => {
+const Calendar = ({ userObj, initViewWeek }) => {
   const [schedule, setSchedule] = useState([]); // 일정
   const [scheduleColor, setScheduleColor] = useState(""); // 일정 색상
+  const [scheduleType, setScheduleType] = useState(0);
   const [open, setOpen] = useState(false); // 일정 입력 폼 오픈
   const [calClickState, setCalClickState] = useState(""); // 신규 작성/수정 및 삭제/읽기 구분
   const [desc, setDesc] = useState(""); // 일정 내용
@@ -41,6 +44,8 @@ const Calendar = ({ userObj }) => {
   const [calPublicId, setCalPublicId] = useState("");
   const [calCreateId, setCalCreateId] = useState("");
 
+  const [aaaaa, setAaaaa] = useState("");
+
   // 상태 초기화 및 팝업 닫기
   const handleClose = () => {
     setOpen(false); // 팝업 닫기
@@ -48,6 +53,7 @@ const Calendar = ({ userObj }) => {
     setCalPublicId("");
     setCalCreateId("");
     setScheduleColor("");
+    setScheduleType(0);
     setDesc("");
     setStartDate("");
     setEndDate("");
@@ -64,25 +70,24 @@ const Calendar = ({ userObj }) => {
   // 일정 색상 선택
   const handleChangeComplete = (color) => {
     setScheduleColor(color.hex);
+
+    let scdType;
+    switch (color.hex) {
+      case "#00de04":
+        scdType = 0;
+        break;
+      case "#3788d8":
+        scdType = 1;
+        break;
+      case "#ff0000":
+        scdType = 2;
+        break;
+      case "#9b9b9b":
+        scdType = 3;
+        break;
+    }
+    setScheduleType(scdType);
   };
-
-  // const useComponentWillMount = (func) => {
-  //   const willMount = useRef(true);
-  //   if (willMount.current) func();
-  //   willMount.current = false;
-  // };
-
-  // // 일정 데이터 가져오기
-  // useComponentWillMount(() => {
-  //   const q = query(collection(dbService, "scheduler"));
-  //   onSnapshot(q, (querySnapshot) => {
-  //     const scheduleArray = querySnapshot.docs.map((doc) => ({
-  //       id: doc.id,
-  //       ...doc.data(),
-  //     }));
-  //     setSchedule(scheduleArray);
-  //   });
-  // });
 
   // 일정 데이터 가져오기
   useEffect(() => {
@@ -121,6 +126,7 @@ const Calendar = ({ userObj }) => {
           start: startDate,
           end: endDate,
           color: scheduleColor,
+          type: scheduleType,
           creatorId: userObj.uid,
           creatorNickName: userObj.displayName,
           createdAt: Date.now(),
@@ -196,23 +202,18 @@ const Calendar = ({ userObj }) => {
     });
   };
 
+  // initViewWeek의 값이 true라면 주간 일정
+  // false 또는 빈값이면 월간 일정
+  // , 높이 조절
+  // Home(true), Schedule(false)
+  const initView = initViewWeek ? "dayGridWeek" : "dayGridMonth";
+  const setHt = initViewWeek ? "250px" : "auto";
+
   return (
     <>
-      <p>
-        &#8251; 일정 유형 &#8251;
-        <br />
-        초록색 : 완료된 일정
-        <br />
-        파란색 : 진행중인 일정
-        <br />
-        빨간색 : 중지된 일정
-        <br />
-        회색 : 진행 예정 일정
-      </p>
-      <br />
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
-        initialView="dayGridMonth"
+        initialView={initView}
         headerToolbar={{
           left: "prev",
           center: "title",
@@ -228,6 +229,7 @@ const Calendar = ({ userObj }) => {
             dayMaxEventRows: 3,
           },
         }}
+        height={setHt}
       />
 
       {open && (

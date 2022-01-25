@@ -7,12 +7,12 @@ import Modal from "@mui/material/Modal";
 import { doc, updateDoc } from "firebase/firestore";
 import { dbService } from "fbase";
 
-const NoticeList = ({ noticeObj, noticeStyle }) => {
-  const [open, setOpen] = useState(false); // 공지 내용 활성화 여부
-  const handleOpen = () => setOpen(true); // 공지 내용 폼 활성화
-  const handleClose = () => setOpen(false); // 공지 내용 폼 비활성화
-  const [noticeTitle, setNoticeTitle] = useState(""); // 클릭한 공지 제목
-  const [noticeDesc, setNoticeDesc] = useState(""); // 클릭한 공지 내용
+const NoticeEventList = ({ noticeObj, noticeStyle }) => {
+  const [open, setOpen] = useState(false); // 이벤트 내용 활성화 여부
+  const handleOpen = () => setOpen(true); // 이벤트 내용 폼 활성화
+  const handleClose = () => setOpen(false); // 이벤트 내용 폼 비활성화
+  const [noticeTitle, setNoticeTitle] = useState(""); // 클릭한 이벤트 제목
+  const [noticeDesc, setNoticeDesc] = useState(""); // 클릭한 이벤트 내용
 
   // 테이블 구조 세팅
   const columns = [
@@ -98,4 +98,4 @@ const NoticeList = ({ noticeObj, noticeStyle }) => {
   );
 };
 
-export default NoticeList;
+export default NoticeEventList;

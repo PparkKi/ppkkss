@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { HashRouter as Router, Route, Routes, Link } from "react-router-dom";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -22,13 +22,17 @@ import {
   HiChatAlt2,
   HiClipboardList,
   HiUserCircle,
+  HiCalendar,
 } from "react-icons/hi";
 import Auth from "pages/Auth";
 import Home from "pages/Home";
+import Schedule from "pages/Schedule";
 import Profile from "pages/Profile";
 import Chatting from "pages/Chatting";
 import Notice from "pages/Notice";
-import { authService } from "fbase";
+import Secret from "pages/Secret";
+import { authService, dbService } from "fbase";
+import { collection, getDocs } from "firebase/firestore";
 
 const drawerWidth = 200;
 
@@ -105,13 +109,21 @@ const containerStyle = {
 const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(true); // 사이드 메뉴 on/off 여부
-  const [menu, setMenu] = useState(["", "chatting", "notice", "profile"]); // 메뉴 link => component
+  const [menu, setMenu] = useState([
+    "",
+    "schedule",
+    "chatting",
+    "notice",
+    "profile",
+  ]); // 메뉴 link => component
   const [icon, setIcon] = useState([
     <HiHome size={39} />,
+    <HiCalendar size={39} />,
     <HiChatAlt2 size={39} />,
     <HiClipboardList size={39} />,
     <HiUserCircle size={39} />,
   ]); // 메뉴 아이콘
+  const [admin, setAdmin] = useState(""); // admin 계정 확인
 
   // 로그아웃
   const onLogOutClick = () => {
@@ -125,6 +137,13 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  useEffect(async () => {
+    const querySnapshot = await getDocs(collection(dbService, "admin"));
+    querySnapshot.forEach((doc) => {
+      setAdmin(doc.data().adminId);
+    });
+  }, []);
 
   return (
     <Router>
@@ -163,7 +182,7 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
               </DrawerHeader>
               <Divider />
               <List>
-                {["Home", "Chatting", "Notice", "Profile"].map(
+                {["Home", "Schedule", "Chatting", "Notice", "Profile"].map(
                   (text, index) => (
                     <Link to={menu[index]} key={index}>
                       <ListItem
@@ -202,6 +221,16 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
                   />
                   <Route
                     exact
+                    path="/schedule"
+                    element={
+                      <Schedule
+                        userObj={userObj}
+                        containerStyle={containerStyle}
+                      />
+                    }
+                  />
+                  <Route
+                    exact
                     path="/profile"
                     element={
                       <Profile
@@ -228,6 +257,18 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
                       <Notice
                         userObj={userObj}
                         containerStyle={containerStyle}
+                        admin={admin}
+                      />
+                    }
+                  />
+                  <Route
+                    exact
+                    path="/secret"
+                    element={
+                      <Secret
+                        userObj={userObj}
+                        containerStyle={containerStyle}
+                        admin={admin}
                       />
                     }
                   />

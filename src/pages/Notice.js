@@ -6,9 +6,11 @@ import {
   onSnapshot,
   orderBy,
   query,
+  where,
 } from "firebase/firestore";
 import { dbService } from "fbase";
 import NoticeList from "components/NoticeList";
+import NoticeEventList from "components/NoticeEventList";
 
 const noticeStyle = {
   position: "absolute",
@@ -21,13 +23,15 @@ const noticeStyle = {
   p: 4,
 };
 
-const Notice = ({ userObj, containerStyle }) => {
+const Notice = ({ userObj, containerStyle, admin }) => {
   const [notice, setNotice] = useState([]); // 공지사항
-  const [admin, setAdmin] = useState(""); // admin 계정 확인
+  const [nevent, setNevent] = useState([]); // 이벤트
 
   useEffect(async () => {
+    // 공지사항
     const q = query(
       collection(dbService, "notices"),
+      where("type", "==", "공지"),
       orderBy("createdAt", "desc")
     );
     onSnapshot(q, (querySnapshot) => {
@@ -38,22 +42,35 @@ const Notice = ({ userObj, containerStyle }) => {
       setNotice(noticeArray);
     });
 
-    const querySnapshot = await getDocs(collection(dbService, "admin"));
-    querySnapshot.forEach((doc) => {
-      setAdmin(doc.data().adminId);
+    // 이벤트
+    const qq = query(
+      collection(dbService, "notices"),
+      where("type", "==", "이벤트"),
+      orderBy("createdAt", "desc")
+    );
+    onSnapshot(qq, (querySnapshot) => {
+      const noticeEventArray = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setNevent(noticeEventArray);
     });
   }, []);
 
   return (
     <div style={containerStyle}>
-      <h1>공지사항</h1>
       <NoticeForm
         userObj={userObj}
         noticeStyle={noticeStyle}
         admin={userObj.uid === admin}
       />
       <div>
+        <h2>공지사항</h2>
         <NoticeList noticeObj={notice} noticeStyle={noticeStyle} />
+      </div>
+      <div>
+        <h2>이벤트</h2>
+        <NoticeEventList noticeObj={nevent} noticeStyle={noticeStyle} />
       </div>
     </div>
   );

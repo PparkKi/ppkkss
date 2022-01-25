@@ -7,7 +7,18 @@ import Modal from "@mui/material/Modal";
 import { doc, updateDoc } from "firebase/firestore";
 import { dbService } from "fbase";
 
-const NoticeList = ({ noticeObj, noticeStyle }) => {
+const noticeStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+};
+
+const MainBorad = ({ noticeObj }) => {
   const [open, setOpen] = useState(false); // 공지 내용 활성화 여부
   const handleOpen = () => setOpen(true); // 공지 내용 폼 활성화
   const handleClose = () => setOpen(false); // 공지 내용 폼 비활성화
@@ -17,33 +28,11 @@ const NoticeList = ({ noticeObj, noticeStyle }) => {
   // 테이블 구조 세팅
   const columns = [
     {
-      title: "No",
-      dataIndex: "no",
-      key: "no",
-      width: 150,
-      align: "center",
-    },
-    {
       title: "제목",
       dataIndex: "title",
       key: "title",
       render: (text) => <a>{text}</a>,
-      align: "center",
       ellipsis: true,
-    },
-    {
-      title: "조회수",
-      dataIndex: "viewCount",
-      key: "viewCount",
-      align: "center",
-      width: 80,
-    },
-    {
-      title: "작성자",
-      dataIndex: "creatorNickName",
-      key: "creatorNickName",
-      align: "center",
-      width: 200,
     },
   ];
 
@@ -58,13 +47,14 @@ const NoticeList = ({ noticeObj, noticeStyle }) => {
   };
 
   return (
-    <div>
+    <>
       <Table
         rowKey={(record) => record.id}
         columns={columns}
         dataSource={noticeObj}
-        bordered={true}
-        pagination={{ position: ["bottomCenter"], pageSize: 3 }}
+        pagination={{ position: ["bottomCenter"], pageSize: 5 }}
+        showHeader={false}
+        size={"small"}
         onRow={(record, index) => {
           return {
             onClick: () => {
@@ -94,8 +84,8 @@ const NoticeList = ({ noticeObj, noticeStyle }) => {
           </Modal>
         </>
       )}
-    </div>
+    </>
   );
 };
 
-export default NoticeList;
+export default MainBorad;
