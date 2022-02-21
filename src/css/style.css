@@ -138,15 +138,32 @@ img {
 
 /******************* schedule css start *******************/
 
-.cal-input {
+.scd-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px !important;
+}
+
+.scd-h1 {
+  margin-bottom: 0px !important;
+  margin-right: 10px !important;
+}
+
+.cal-input,
+.cal-readInput {
   width: 100%;
-  max-width: 430px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cal-input > div,
+.cal-readInput > div {
+  margin-bottom: 20px;
 }
 
 .cal-submit {
   display: flex;
   justify-content: flex-end;
-  margin-top: 10px;
 }
 
 .scdColor {
@@ -167,6 +184,22 @@ img {
 }
 .scdColor-rv {
   background-color: #9b9b9b;
+}
+
+.cal-datepicker,
+.cal-color {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.cal-button {
+  margin-bottom: 30px !important;
+}
+
+.cal-readtitle {
+  display: flex;
+  justify-content: space-between;
 }
 
 /******************* schedule css end *******************/
@@ -329,6 +362,11 @@ img {
   flex-direction: column;
   justify-content: space-around;
   margin-left: 20px;
+}
+
+.profile-scdTitle {
+  display: flex;
+  justify-content: space-between;
 }
 
 /******************* profile css end *******************/

@@ -20,6 +20,10 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import DatePicker from "@mui/lab/DatePicker";
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
+import Button from "@mui/material/Button";
 
 const calStyle = {
   position: "absolute",
@@ -38,13 +42,13 @@ const Calendar = ({ userObj, initViewWeek }) => {
   const [scheduleType, setScheduleType] = useState(0);
   const [open, setOpen] = useState(false); // 일정 입력 폼 오픈
   const [calClickState, setCalClickState] = useState(""); // 신규 작성/수정 및 삭제/읽기 구분
+  const [title, setTitle] = useState(""); // 일정 제목
   const [desc, setDesc] = useState(""); // 일정 내용
-  const [startDate, setStartDate] = useState(""); // 일정 시작 날짜
-  const [endDate, setEndDate] = useState(""); // 일정 끝 날짜
+  const [startDate, setStartDate] = useState(null); // 일정 시작 날짜
+  const [endDate, setEndDate] = useState(null); // 일정 끝 날짜
+  const [scdCreator, setScdCreator] = useState(""); // 일정 작성자
   const [calPublicId, setCalPublicId] = useState("");
   const [calCreateId, setCalCreateId] = useState("");
-
-  const [aaaaa, setAaaaa] = useState("");
 
   // 상태 초기화 및 팝업 닫기
   const handleClose = () => {
@@ -54,17 +58,19 @@ const Calendar = ({ userObj, initViewWeek }) => {
     setCalCreateId("");
     setScheduleColor("");
     setScheduleType(0);
+    setTitle("");
     setDesc("");
-    setStartDate("");
-    setEndDate("");
+    setStartDate(null);
+    setEndDate(null);
   };
 
   const onChange = (event) => {
     const {
-      target: { value },
+      target: { name, value },
     } = event;
 
-    setDesc(value);
+    if (name === "title") setTitle(value);
+    else if (name === "desc") setDesc(value);
   };
 
   // 일정 색상 선택
@@ -101,12 +107,10 @@ const Calendar = ({ userObj, initViewWeek }) => {
     });
   }, []);
 
-  // 시작 일 - 마지막 일 선택시(드래그 선택 or 클릭 선택) 입력 팝업 오픈
-  const dateSelectHandle = (event) => {
+  // "일정 등록" 버튼 클릭시 입력 팝업 오픈
+  const dateSelectHandle = () => {
     setCalClickState("new");
     setOpen(true);
-    setStartDate(event.startStr);
-    setEndDate(event.endStr);
   };
 
   // 일정 신규 등록 및 수정
@@ -120,9 +124,10 @@ const Calendar = ({ userObj, initViewWeek }) => {
     }
 
     if (calClickState === "new") {
-      if (desc) {
+      if (title && desc) {
         const contents = {
-          title: `${userObj.displayName} : ${desc}`,
+          title: `${userObj.displayName} : ${title}`,
+          desc,
           start: startDate,
           end: endDate,
           color: scheduleColor,
@@ -132,16 +137,23 @@ const Calendar = ({ userObj, initViewWeek }) => {
           createdAt: Date.now(),
         };
         await addDoc(collection(dbService, "scheduler"), contents);
+      } else if (startDate > endDate) {
+        alert("일정 범위를 확인해 주세요.");
+        return false;
       } else {
-        alert("일정 내용을 입력해 주세요.");
+        alert("일정 제목과 내용을 입력해 주세요.");
+        return false;
       }
     } else if (calClickState === "edit") {
       if (userObj.uid === calCreateId) {
         schedule.map((scd) => {
           if (calPublicId === scd.id) {
             updateDoc(doc(dbService, `scheduler/${scd.id}`), {
-              title: `${userObj.displayName} : ${desc}`,
+              title: `${userObj.displayName} : ${title}`,
+              desc,
               color: scheduleColor,
+              start: startDate,
+              end: endDate,
             });
           }
         });
@@ -151,6 +163,7 @@ const Calendar = ({ userObj, initViewWeek }) => {
   };
 
   // 선택한 일정 수정 및 삭제
+  // 등록된 일정 클릭 이벤트
   const editEventHandle = async (event) => {
     // 일정 내용, 일정 문서 id
     const {
@@ -163,25 +176,37 @@ const Calendar = ({ userObj, initViewWeek }) => {
     const {
       event: {
         _def: {
-          extendedProps: { creatorId },
+          extendedProps: { creatorId, desc, creatorNickName },
         },
       },
     } = event;
-    setCalPublicId(publicId);
-    setCalCreateId(creatorId);
+
+    // 일정 범위 (시작/끝 날짜)
+    const {
+      event: {
+        _instance: {
+          range: { start, end },
+        },
+      },
+    } = event;
 
     let arrr = title.split(" : ");
     arrr.splice(0, 1);
+    let sDate = start.toISOString().split("T")[0];
+    let eDate = end.toISOString().split("T")[0];
 
-    if (userObj.uid === creatorId) {
-      // 내가 쓴 일정이라면, 일정 수정 및 삭제
-      setDesc(arrr.join(":"));
-      setCalClickState("edit");
-    } else {
-      // 다른 사람의 일정이라면, 읽기
-      setDesc(arrr.join(":"));
-      setCalClickState("read");
-    }
+    // 내가 쓴 일정이라면, 일정 수정 및 삭제
+    // 다른 사람의 일정이라면, 읽기
+    if (userObj.uid === creatorId) setCalClickState("edit");
+    else setCalClickState("read");
+
+    setCalPublicId(publicId);
+    setCalCreateId(creatorId);
+    setScdCreator(creatorNickName);
+    setTitle(arrr.join(":"));
+    setDesc(desc);
+    setStartDate(sDate);
+    setEndDate(eDate);
     setOpen(true);
   };
 
@@ -211,6 +236,15 @@ const Calendar = ({ userObj, initViewWeek }) => {
 
   return (
     <>
+      {!initViewWeek && (
+        <Button
+          variant="contained"
+          className="cal-button"
+          onClick={dateSelectHandle}
+        >
+          일정 등록
+        </Button>
+      )}
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
         initialView={initView}
@@ -220,7 +254,7 @@ const Calendar = ({ userObj, initViewWeek }) => {
           right: "next",
         }}
         selectable="true"
-        select={dateSelectHandle}
+        // select={dateSelectHandle}
         events={schedule}
         eventClick={editEventHandle}
         locale="ko"
@@ -238,27 +272,89 @@ const Calendar = ({ userObj, initViewWeek }) => {
           onClose={handleClose}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
+          disableEscapeKeyDown={true}
         >
           {calClickState === "read" ? (
             <Box sx={calStyle}>
-              <Typography id="modal-modal-description">{desc}</Typography>
+              <Typography className="cal-readtitle">
+                <sapn><b>작성자</b> : {scdCreator}</sapn>
+                <sapn><b>일정</b> : {startDate} ~ {endDate}</sapn>
+              </Typography>
+              <br />
+              <div className="cal-readInput">
+                <TextField
+                  id="outlined-basic"
+                  label="제목"
+                  variant="outlined"
+                  name="title"
+                  value={title}
+                />
+                <TextField
+                  id="outlined-multiline-static"
+                  label="내용"
+                  multiline
+                  rows={7}
+                  value={desc}
+                />
+              </div>
             </Box>
           ) : (
             <Box component="form" sx={calStyle} onSubmit={onSubmit}>
-              <CirclePicker
-                colors={["#00de04", "#3788d8", "#ff0000", "#9b9b9b"]}
-                onChangeComplete={handleChangeComplete}
-              />
-              <br />
-              <TextField
-                id="outlined-multiline-static"
-                label="일정 내용"
-                multiline
-                rows={4}
-                className="cal-input"
-                value={desc}
-                onChange={onChange}
-              />
+              <div className="cal-color">
+                일정 유형 선택 : &nbsp;
+                <CirclePicker
+                  colors={["#00de04", "#3788d8", "#ff0000", "#9b9b9b"]}
+                  onChangeComplete={handleChangeComplete}
+                />
+              </div>
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <div className="cal-datepicker">
+                  <DatePicker
+                    label="Start"
+                    disablePast
+                    inputFormat={"yyyy-MM-dd"}
+                    mask={"____-__-__"}
+                    value={startDate}
+                    onChange={(newValue) => {
+                      let sDate = newValue.toISOString().split("T")[0];
+                      setStartDate(sDate);
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                  &nbsp;&nbsp;~&nbsp;&nbsp;
+                  <DatePicker
+                    label="End"
+                    disablePast
+                    inputFormat={"yyyy-MM-dd"}
+                    mask={"____-__-__"}
+                    value={endDate}
+                    onChange={(newValue) => {
+                      let eDate = newValue.toISOString().split("T")[0];
+                      setEndDate(eDate);
+                    }}
+                    renderInput={(params) => <TextField {...params} />}
+                  />
+                </div>
+              </LocalizationProvider>
+              <div className="cal-input">
+                <TextField
+                  id="outlined-basic"
+                  label="제목"
+                  variant="outlined"
+                  name="title"
+                  value={title}
+                  onChange={onChange}
+                />
+                <TextField
+                  id="outlined-multiline-static"
+                  label="내용"
+                  multiline
+                  rows={7}
+                  name="desc"
+                  value={desc}
+                  onChange={onChange}
+                />
+              </div>
               <div className="cal-submit">
                 {calClickState === "new" && (
                   <input type="submit" value="등록" />

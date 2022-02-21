@@ -3,13 +3,22 @@ import { Table } from "antd";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Typography from "@mui/material/Typography";
+import TextField from "@mui/material/TextField";
 
 const MyScdTable = ({ scdObj, style }) => {
   const [isView, setIsView] = useState(false); // 일정 뷰 팝업
-  const [viewScd, setViewScd] = useState(""); // 선택한 일정 내용
+  const [viewScdTitle, setViewScdTitle] = useState(""); // 선택한 일정 제목
+  const [viewScdDesc, setViewScdDesc] = useState(""); // 선택한 일정 내용
+  const [viewScdCreator, setViewScdCreator] = useState(""); // 선택한 일정 작성자
+  const [startDate, setStartDate] = useState(null); // 일정 시작 날짜
+  const [endDate, setEndDate] = useState(null); // 일정 끝 날짜
   const handleClose = () => {
-    setViewScd("");
     setIsView(false);
+    setViewScdTitle("");
+    setViewScdDesc("");
+    setViewScdCreator("");
+    setStartDate(null);
+    setEndDate(null);
   };
 
   // 테이블 구조 세팅
@@ -27,15 +36,6 @@ const MyScdTable = ({ scdObj, style }) => {
       key: "title",
       ellipsis: true,
       align: "center",
-      render: (text) => (
-        <a
-          onClick={() => {
-            onScdClick(text);
-          }}
-        >
-          {text}
-        </a>
-      ),
     },
     {
       title: "일정 유형",
@@ -57,13 +57,17 @@ const MyScdTable = ({ scdObj, style }) => {
     },
   ];
 
-  // 일정 내용 클릭 이벤트
-  const onScdClick = (text) => {
+  // "나의 일정" 열 클릭
+  const onClickRow = (record, index) => {
     setIsView(true);
 
-    let arrr = text.split(" : ");
+    let arrr = record.title.split(" : ");
     arrr.splice(0, 1);
-    setViewScd(arrr.join(":"));
+    setViewScdTitle(arrr.join(":"));
+    setViewScdDesc(record.desc);
+    setViewScdCreator(record.creatorNickName);
+    setStartDate(record.start);
+    setEndDate(record.end);
   };
 
   return (
@@ -74,6 +78,13 @@ const MyScdTable = ({ scdObj, style }) => {
         dataSource={scdObj}
         bordered={true}
         pagination={{ position: ["bottomCenter"], pageSize: 3 }}
+        onRow={(record, index) => {
+          return {
+            onClick: () => {
+              onClickRow(record, index);
+            },
+          };
+        }}
       />
 
       {isView && (
@@ -84,7 +95,27 @@ const MyScdTable = ({ scdObj, style }) => {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            <Typography id="modal-modal-description">{viewScd}</Typography>
+            <Typography className="profile-scdTitle">
+              <sapn><b>작성자</b> : {viewScdCreator}</sapn>
+              <sapn><b>일정</b> : {startDate} ~ {endDate}</sapn>
+            </Typography>
+            <br />
+            <div className="cal-readInput">
+              <TextField
+                id="outlined-basic"
+                label="제목"
+                variant="outlined"
+                name="title"
+                value={viewScdTitle}
+              />
+              <TextField
+                id="outlined-multiline-static"
+                label="내용"
+                multiline
+                rows={7}
+                value={viewScdDesc}
+              />
+            </div>
           </Box>
         </Modal>
       )}
