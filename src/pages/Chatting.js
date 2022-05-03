@@ -3,6 +3,7 @@ import { collection, onSnapshot, orderBy, query } from "@firebase/firestore";
 import Chat from "components/Chat";
 import ChatForm from "components/ChatForm";
 import { dbService } from "fbase";
+import { useMediaQuery } from "react-responsive";
 
 const Chatting = ({ userObj, containerStyle }) => {
   const [chats, setChats] = useState([]); // 입력된 총 메시지
@@ -32,9 +33,14 @@ const Chatting = ({ userObj, containerStyle }) => {
     scrollToBottom();
   }, [chats]);
 
+  const isMobile = useMediaQuery({
+    query: "(max-width:540px)",
+  });
+  const isMobileSize = isMobile ? "m-chat-item-wrap" : "chat-item-wrap"
+
   return (
     <div className="chat-wrap" style={containerStyle}>
-      <div className="chat-item-wrap">
+      <div className={isMobileSize}>
         {chats.map((chat) => (
           <Chat
             key={chat.id}

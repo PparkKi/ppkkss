@@ -20,8 +20,8 @@ const NoticeEventList = ({ noticeObj, noticeStyle }) => {
       title: "No",
       dataIndex: "no",
       key: "no",
-      width: 150,
       align: "center",
+      width: 150,
     },
     {
       title: "제목",
@@ -30,6 +30,7 @@ const NoticeEventList = ({ noticeObj, noticeStyle }) => {
       render: (text) => <a>{text}</a>,
       align: "center",
       ellipsis: true,
+      width: 200,
     },
     {
       title: "조회수",
@@ -43,7 +44,7 @@ const NoticeEventList = ({ noticeObj, noticeStyle }) => {
       dataIndex: "creatorNickName",
       key: "creatorNickName",
       align: "center",
-      width: 200,
+      width: 80,
     },
   ];
 

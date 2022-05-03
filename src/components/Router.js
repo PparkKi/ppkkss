@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { HashRouter as Router, Route, Routes, Link } from "react-router-dom";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import MuiDrawer from "@mui/material/Drawer";
-import MuiAppBar from "@mui/material/AppBar";
+import Drawer from "@mui/material/Drawer";
+import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -11,8 +11,6 @@ import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -33,72 +31,9 @@ import Notice from "pages/Notice";
 import Secret from "pages/Secret";
 import { authService, dbService } from "fbase";
 import { collection, getDocs } from "firebase/firestore";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 const drawerWidth = 200;
-
-const openedMixin = (theme) => ({
-  width: drawerWidth,
-  transition: theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.enteringScreen,
-  }),
-  overflowX: "hidden",
-});
-
-const closedMixin = (theme) => ({
-  transition: theme.transitions.create("width", {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  overflowX: "hidden",
-  width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
-    width: `calc(${theme.spacing(9)} + 1px)`,
-  },
-});
-
-const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
-  ...theme.mixins.toolbar,
-}));
-
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(["width", "margin"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}));
-
-const Drawer = styled(MuiDrawer, {
-  shouldForwardProp: (prop) => prop !== "open",
-})(({ theme, open }) => ({
-  width: drawerWidth,
-  flexShrink: 0,
-  whiteSpace: "nowrap",
-  boxSizing: "border-box",
-  ...(open && {
-    ...openedMixin(theme),
-    "& .MuiDrawer-paper": openedMixin(theme),
-  }),
-  ...(!open && {
-    ...closedMixin(theme),
-    "& .MuiDrawer-paper": closedMixin(theme),
-  }),
-}));
 
 // 사이드 네비를 포함하지 않는 콘텐츠 영역 스타일
 const containerStyle = {
@@ -106,9 +41,13 @@ const containerStyle = {
   marginTop: "70px",
 };
 
-const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
+const AppRouter = ({ userObj, refreshUser, isLoggedIn, window }) => {
   const theme = useTheme();
-  const [open, setOpen] = useState(true); // 사이드 메뉴 on/off 여부
+  const isMdUp = useMediaQuery(theme.breakpoints.up("lg"));
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
   const [menu, setMenu] = useState([
     "",
     "schedule",
@@ -123,6 +62,7 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
     <HiClipboardList size={39} />,
     <HiUserCircle size={39} />,
   ]); // 메뉴 아이콘
+
   const [admin, setAdmin] = useState(""); // admin 계정 확인
 
   // 로그아웃
@@ -130,13 +70,35 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
     authService.signOut();
   };
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+  const drawer = (
+    <div>
+      <Toolbar />
+      <Divider />
+      <List>
+        {["Home", "Schedule", "Chatting", "Notice", "Profile"].map(
+          (text, index) => (
+            <Link to={menu[index]} key={index}>
+              <ListItem
+                button
+                key={text}
+                style={{ marginBottom: "10px", marginTop: "10px" }}
+                onClick={handleDrawerToggle}
+              >
+                <ListItemIcon>{icon[index]}</ListItemIcon>
+                <ListItemText primary={text} style={{ color: "#616161" }} />
+              </ListItem>
+            </Link>
+          )
+        )}
+      </List>
+      <Link to="/" className="logOut-button">
+        <FaPowerOff onClick={onLogOutClick} size={30} />
+      </Link>
+    </div>
+  );
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
 
   useEffect(async () => {
     const querySnapshot = await getDocs(collection(dbService, "admin"));
@@ -151,17 +113,20 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
         {isLoggedIn && (
           <>
             <CssBaseline />
-            <AppBar position="fixed" open={open}>
+            <AppBar
+              position="fixed"
+              sx={{
+                width: { sm: `calc(100% - ${drawerWidth}px)` },
+                ml: { sm: `${drawerWidth}px` },
+              }}
+            >
               <Toolbar>
                 <IconButton
                   color="inherit"
                   aria-label="open drawer"
-                  onClick={handleDrawerOpen}
                   edge="start"
-                  sx={{
-                    marginRight: "36px",
-                    ...(open && { display: "none" }),
-                  }}
+                  onClick={handleDrawerToggle}
+                  sx={{ mr: 2, display: { sm: "none" } }}
                 >
                   <MenuIcon />
                 </IconButton>
@@ -170,44 +135,53 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
                 </Typography>
               </Toolbar>
             </AppBar>
-            <Drawer variant="permanent" open={open}>
-              <DrawerHeader>
-                <IconButton onClick={handleDrawerClose}>
-                  {theme.direction === "rtl" ? (
-                    <ChevronRightIcon />
-                  ) : (
-                    <ChevronLeftIcon />
-                  )}
-                </IconButton>
-              </DrawerHeader>
-              <Divider />
-              <List>
-                {["Home", "Schedule", "Chatting", "Notice", "Profile"].map(
-                  (text, index) => (
-                    <Link to={menu[index]} key={index}>
-                      <ListItem
-                        button
-                        key={text}
-                        style={{ marginBottom: "10px", marginTop: "10px" }}
-                      >
-                        <ListItemIcon>{icon[index]}</ListItemIcon>
-                        <ListItemText
-                          primary={text}
-                          style={{ color: "#616161" }}
-                        />
-                      </ListItem>
-                    </Link>
-                  )
-                )}
-              </List>
-              <Link to="/" className="logOut-button">
-                <FaPowerOff onClick={onLogOutClick} size={30} />
-              </Link>
-            </Drawer>
+            <Box
+              component="nav"
+              sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+              aria-label="mailbox folders"
+            >
+              <Drawer
+                container={container}
+                variant={isMdUp ? "permanent" : "temporary"}
+                open={mobileOpen}
+                onClose={handleDrawerToggle}
+                ModalProps={{
+                  keepMounted: true, // Better open performance on mobile.
+                }}
+                sx={{
+                  display: { xs: "block", sm: "none" },
+                  "& .MuiDrawer-paper": {
+                    boxSizing: "border-box",
+                    width: drawerWidth,
+                  },
+                }}
+              >
+                {drawer}
+              </Drawer>
+              <Drawer
+                variant="permanent"
+                sx={{
+                  display: { xs: "none", sm: "block" },
+                  "& .MuiDrawer-paper": {
+                    boxSizing: "border-box",
+                    width: drawerWidth,
+                  },
+                }}
+                open
+              >
+                {drawer}
+              </Drawer>
+            </Box>
           </>
         )}
 
-        <Box component="main" sx={{ flexGrow: 1 }}>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            width: { sm: `calc(100% - ${drawerWidth}px)` },
+          }}
+        >
           <div className="container">
             <Routes>
               {isLoggedIn ? (
@@ -216,7 +190,10 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn }) => {
                     exact
                     path="/"
                     element={
-                      <Home userObj={userObj} containerStyle={containerStyle} />
+                      <Home
+                        userObj={userObj}
+                        containerStyle={containerStyle}
+                      />
                     }
                   />
                   <Route

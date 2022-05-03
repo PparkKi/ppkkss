@@ -8,14 +8,18 @@ img {
 }
 
 .logOut-button {
-  margin: 0 auto;
-  margin-top: 30px;
+  display: flex;
+  justify-content: center;
   color: #717171;
   cursor: pointer;
 }
 
 .logOut-button:hover {
   color: #ff3c19;
+}
+
+.container {
+  min-width: 500px !important;
 }
 
 /******************* auth css start *******************/
@@ -209,6 +213,11 @@ img {
 .chat-item-wrap {
   width: 100%;
   height: 70vh;
+  overflow-y: scroll;
+}
+.m-chat-item-wrap {
+  width: 100%;
+  height: 90vh;
   overflow-y: scroll;
 }
 

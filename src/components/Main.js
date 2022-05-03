@@ -34,7 +34,7 @@ const Item = styled(Paper)(({ theme }) => ({
   height: theme.spacing(45),
 }));
 
-const Main = ({ userObj }) => {
+const Main = ({ userObj, isPc }) => {
   const [notices, setNotices] = useState([]); // 공지, 이벤트 총 게시판
   const [admin, setAdmin] = useState(""); // admin 계정 확인
 
@@ -57,6 +57,8 @@ const Main = ({ userObj }) => {
     });
   }, []);
 
+  const isPcSize = isPc ? 6 : 12;
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
@@ -70,7 +72,7 @@ const Main = ({ userObj }) => {
             </div>
           </ItemTop>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={isPcSize}>
           <Item sx={{ boxShadow: 7 }}>
             <div className="main-gridTitle">
               <h4>금주일정</h4>
@@ -81,7 +83,7 @@ const Main = ({ userObj }) => {
             <Calendar userObj={userObj} initViewWeek={true} />
           </Item>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={isPcSize}>
           <Item sx={{ boxShadow: 7 }}>
             <div className="main-gridTitle">
               <h4>게시판</h4>
@@ -92,7 +94,7 @@ const Main = ({ userObj }) => {
             <MainBorad noticeObj={notices} />
           </Item>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={isPcSize}>
           <Item sx={{ boxShadow: 7 }}>
             <div className="main-gridTitle">
               <h4>채팅</h4>
@@ -103,7 +105,7 @@ const Main = ({ userObj }) => {
             <MainChatting userObj={userObj} />
           </Item>
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={isPcSize}>
           <Item sx={{ boxShadow: 7 }}>
             <div className="main-gridTitle">
               <h4>면접 제안</h4>
