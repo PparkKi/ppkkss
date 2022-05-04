@@ -19,7 +19,7 @@ img {
 }
 
 .container {
-  min-width: 500px !important;
+  min-width: 370px !important;
 }
 
 /******************* auth css start *******************/
@@ -29,6 +29,10 @@ img {
   justify-content: center;
   align-items: center;
   height: 100vh;
+}
+
+.m-auth-wrap {
+  flex-direction: column;
 }
 
 .auth-form {

@@ -9,6 +9,7 @@ import Switch from "@mui/material/Switch";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
+import { useMediaQuery } from "react-responsive";
 
 // 메인 팝업 style
 const style = {
@@ -16,7 +17,7 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 450,
+  minWidth: 350,
   bgcolor: "background.paper",
   border: "2px solid #000",
   boxShadow: 24,
@@ -52,6 +53,12 @@ const Auth = () => {
   // 로그인인지 회원가입인지 체크
   const label = { inputProps: { "aria-label": "Switch demo" } };
 
+  // 모바일 사이즈일 경우 css 변경
+  const isMobile = useMediaQuery({
+    query: "(max-width:540px)",
+  });
+  const isMobileStyle = isMobile ? "m-auth-wrap" : "";
+
   return (
     <>
       <div>
@@ -71,7 +78,7 @@ const Auth = () => {
         </Modal>
       </div>
       
-      <div id="auth-wrap">
+      <div id="auth-wrap" className={isMobileStyle}>
         <img src={introImg} alt="" className="auth-img" />
         <div className="auth-container">
           <AuthForm newAccount={newAccount} />
