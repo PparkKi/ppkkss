@@ -59,6 +59,7 @@ const MyChatTable = ({ chatObj, style }) => {
           "X"
         );
       },
+      responsive: ["sm"],
     },
     {
       title: "좋아요",
@@ -66,6 +67,7 @@ const MyChatTable = ({ chatObj, style }) => {
       key: "favCount",
       align: "center",
       width: 80,
+      responsive: ["sm"],
     },
     {
       title: "수정",

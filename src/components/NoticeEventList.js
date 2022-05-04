@@ -22,6 +22,7 @@ const NoticeEventList = ({ noticeObj, noticeStyle }) => {
       key: "no",
       align: "center",
       width: 150,
+      responsive: ["sm"],
     },
     {
       title: "제목",
@@ -38,6 +39,7 @@ const NoticeEventList = ({ noticeObj, noticeStyle }) => {
       key: "viewCount",
       align: "center",
       width: 80,
+      responsive: ["sm"],
     },
     {
       title: "작성자",
@@ -45,6 +47,7 @@ const NoticeEventList = ({ noticeObj, noticeStyle }) => {
       key: "creatorNickName",
       align: "center",
       width: 80,
+      responsive: ["sm"],
     },
   ];
 

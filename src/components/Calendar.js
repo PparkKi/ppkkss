@@ -30,7 +30,7 @@ const calStyle = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 500,
+  minWidth: 375,
   bgcolor: "background.paper",
   boxShadow: 24,
   p: 4,
@@ -301,10 +301,11 @@ const Calendar = ({ userObj, initViewWeek }) => {
           ) : (
             <Box component="form" sx={calStyle} onSubmit={onSubmit}>
               <div className="cal-color">
-                일정 유형 선택 : &nbsp;
+                <span>일정 유형 &nbsp;</span>
                 <CirclePicker
                   colors={["#00de04", "#3788d8", "#ff0000", "#9b9b9b"]}
                   onChangeComplete={handleChangeComplete}
+                  className="cal-circle"
                 />
               </div>
               <LocalizationProvider dateAdapter={AdapterDateFns}>

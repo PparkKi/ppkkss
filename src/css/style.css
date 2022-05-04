@@ -207,7 +207,11 @@ img {
 
 .cal-readtitle {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+}
+
+.cal-circle {
+  width: 240px !important;
 }
 
 /******************* schedule css end *******************/
