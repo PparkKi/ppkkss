@@ -29,6 +29,7 @@ const MyScdTable = ({ scdObj, style }) => {
       key: "start",
       align: "center",
       width: 200,
+      responsive: ["sm"],
     },
     {
       title: "내용",

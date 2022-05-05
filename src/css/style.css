@@ -246,6 +246,7 @@ img {
 .chat-my {
   margin-left: auto;
   background-color: #ffecd5;
+  word-break: break-all;
 }
 
 .chat-edit-button {
@@ -383,7 +384,7 @@ img {
 
 .profile-scdTitle {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
 }
 
 /******************* profile css end *******************/
