@@ -79,7 +79,7 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn, window }) => {
       <Toolbar />
       <Divider />
       <List>
-        {["Home", "Introduce", "Schedule", "Chatting", "Notice", "Profile"].map(
+        {["홈", "소개글", "일정관리", "채팅방", "공지/게시판", "프로필"].map(
           (text, index) => (
             <Link to={menu[index]} key={index}>
               <ListItem
