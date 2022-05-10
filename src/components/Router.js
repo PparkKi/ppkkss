@@ -21,9 +21,11 @@ import {
   HiClipboardList,
   HiUserCircle,
   HiCalendar,
+  HiViewBoards,
 } from "react-icons/hi";
 import Auth from "pages/Auth";
 import Home from "pages/Home";
+import Introduce from "pages/Introduce";
 import Schedule from "pages/Schedule";
 import Profile from "pages/Profile";
 import Chatting from "pages/Chatting";
@@ -50,6 +52,7 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn, window }) => {
   };
   const [menu, setMenu] = useState([
     "",
+    "introduce",
     "schedule",
     "chatting",
     "notice",
@@ -57,6 +60,7 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn, window }) => {
   ]); // 메뉴 link => component
   const [icon, setIcon] = useState([
     <HiHome size={39} />,
+    <HiViewBoards size={39} />,
     <HiCalendar size={39} />,
     <HiChatAlt2 size={39} />,
     <HiClipboardList size={39} />,
@@ -75,7 +79,7 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn, window }) => {
       <Toolbar />
       <Divider />
       <List>
-        {["Home", "Schedule", "Chatting", "Notice", "Profile"].map(
+        {["Home", "Introduce", "Schedule", "Chatting", "Notice", "Profile"].map(
           (text, index) => (
             <Link to={menu[index]} key={index}>
               <ListItem
@@ -190,7 +194,14 @@ const AppRouter = ({ userObj, refreshUser, isLoggedIn, window }) => {
                     exact
                     path="/"
                     element={
-                      <Home
+                      <Home userObj={userObj} containerStyle={containerStyle} />
+                    }
+                  />
+                  <Route
+                    exact
+                    path="/introduce"
+                    element={
+                      <Introduce
                         userObj={userObj}
                         containerStyle={containerStyle}
                       />

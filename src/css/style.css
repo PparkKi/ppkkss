@@ -7,6 +7,10 @@ img {
   height: auto !important;
 }
 
+ul li {
+  list-style: none;
+}
+
 .logOut-button {
   display: flex;
   justify-content: center;
@@ -143,6 +147,35 @@ img {
 }
 
 /******************* home(main) css end *******************/
+
+
+
+/******************* introduce css start *******************/
+
+.intro-title {
+  font-size: 2rem;
+  font-family: serif;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.ic-img {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  margin-bottom: 50px;
+}
+
+.ic-desc {
+  display: flex;
+  justify-content: center;
+  line-height: 1.5;
+}
+
+/******************* introduce css end *******************/
+
+
 
 /******************* schedule css start *******************/
 
